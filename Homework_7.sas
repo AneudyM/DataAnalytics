@@ -31,8 +31,8 @@ data hmk7;
 run;
 proc format;
 	value ethnf 0 = "White"
-				1 = "Black"
-				2 = "Hispanic";
+			1 = "Black"
+			2 = "Hispanic";
 run;
 proc means data=hmk7;
 	format ethnic ethnf.;
