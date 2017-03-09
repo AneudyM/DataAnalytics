@@ -30,8 +30,7 @@ data hmk7;
 	;
 run;
 proc format;
-	value ethnf 
-			0 = "White"
+	value ethnf 0 = "White"
 		    1 = "Black"
 		    2 = "Hispanic";
 run;
@@ -39,3 +38,8 @@ proc means data=hmk7;
 	format ethnic ethnf.;
 	class ethnic;
 run;
+ods graphics on;
+proc reg data=hmk7 plots(only)=none;
+	model gpa = test black hispanic;
+run;
+ods graphics off;
