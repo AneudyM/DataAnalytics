@@ -30,7 +30,8 @@ data hmk7;
 	;
 run;
 proc format;
-	value ethnf 0 = "White"
+	value ethnf 
+			0 = "White"
 		    1 = "Black"
 		    2 = "Hispanic";
 run;
