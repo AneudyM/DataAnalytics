@@ -9,7 +9,7 @@ data hmk7;
 	if ethnic in (0,1) then hispanic = 0;
 	/* Interaction between ethnicity and test scores */
 	test_white = white * test;
-	test_black = blak * test;
+	test_black = black * test;
 	test_hispanic = hispanic * test;
 	/* Raw data */
 	datalines;
@@ -46,17 +46,25 @@ proc means mean std data=hmk7;
 run;
 ods graphics on;	* Needed for SAS University Edition to generate graphs;
 /* Regression Analysis using REG */
-proc reg data=hmk7 plots(only)=none;
+proc reg data=hmk7 plots(only)=(RSTUDENTBYPREDICTED);
 	title 'Regression Analysis for GPA using REG';
 	title2 'Interactions included';
-	model gpa = test black hispanic test_black test_hispanic / r covb;
-	output out=diagnostics predicted=pre rstudent=res;
+	model gpa = test black hispanic 
+				test_black test_hispanic / p r covb vif collinoint influence
+										   dw dwprob;
+	output out=diagnostics predicted=pre rstudent=sres;
 run;
 /* Regression Analysis usign GLM */
-proc glm data=hmk7;
+proc glm data=hmk7 plots=ancovaplot(clm);
 	title 'Regression Analysis for GPA using GLM';
 	title2 'Interactions included';
+	format ethnic ethnf.;
 	class ethnic;
-	model gpa = test ethnic test*ethnic / solution;
+	model gpa = test ethnic test*ethnic / solution alpha=0.05;
+	means ethnic / duncan tukey lines;
+run;
+proc univariate normal plots data=diagnostics;
+	var sres;
+	title 'Test of Normality of Residuals';
 run;
 ods graphics off;
