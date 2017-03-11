@@ -1,11 +1,19 @@
 data hmk7;
 	input gpa test ethnic;
+	/* Segmentation for Dummy Coding */
 	if ethnic = 0 then white = 0;
 	if ethnic in (1,2) then white = 0;
 	if ethnic = 1 then black = 1;
 	if ethnic in (0,2) then black = 0;
 	if ethnic = 2 then hispanic = 1;
 	if ethnic in (0,1) then hispanic = 0;
+
+	/* Interaction between ethnicity and test scores */
+	test_white = white * test;
+	test_black = blak * test;
+	test_hispanic = hispanic * test;
+	
+	/* Raw data */
 	datalines;
 	3.0 5.5 0
 	2.3 4.8 0
@@ -28,13 +36,13 @@ data hmk7;
 	2.2 4.1 0
 	1.5 4.7 0
 	;
+	/* Assigning labels to the levels of the ethnic variable */
+	proc format;
+		value ethnf 0 = "White" 1 = "Black" 2 = "Hispanic";
+	run;
 run;
-proc format;
-	value ethnf 0 = "White"
-		    1 = "Black"
-		    2 = "Hispanic";
-run;
-proc means data=hmk7;
+/* Getting descriptive statistics */
+proc means mean std data=hmk7;
 	format ethnic ethnf.;
 	class ethnic;
 run;
@@ -42,4 +50,5 @@ ods graphics on;
 proc reg data=hmk7 plots(only)=none;
 	model gpa = test black hispanic;
 run;
+
 ods graphics off;
