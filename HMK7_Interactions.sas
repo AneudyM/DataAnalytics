@@ -1,5 +1,6 @@
 data hmk7;
 	input gpa test ethnic;
+	id = _n_;
 	/* Segmentation for Dummy Coding */
 	if ethnic = 0 then white = 0;
 	if ethnic in (1,2) then white = 0;
@@ -75,5 +76,47 @@ proc univariate normal plots data=hmk7InterDiag;
 	var interSres;
 	title 'Test of Normality of Residuals with Interactions';
 run;
+ods graphics off;
 
+/* DELETED OBSERVATION */
+ods graphics on;	* Needed for SAS University Edition to generate graphs;
+/* Regression Analysis using REG with Interactions */
+proc reg data=hmk7 plots(only)=(RSTUDENTBYPREDICTED OBSERVEDBYPREDICTED);
+	title 'Regression Analysis for GPA using REG';
+	title2 'Interactions included';
+	model gpa = test black hispanic test_black test_hispanic 
+	/ p r covb vif collinoint influence dw dwprob;
+	id id;
+	where id ne 17;
+	where also id ne 18;
+	output out=hmk7InterDiag predicted=interPre rstudent=interSres;
+run;
+/* Regression Analysis usign GLM with Interactions*/
+proc glm data=hmk7 plots=ancovaplot(clm);
+	title 'Regression Analysis for GPA using GLM';
+	title2 'Interactions included';
+	format ethnic ethnf.;
+	class ethnic;
+	model gpa = test ethnic test*ethnic / solution alpha=0.05;
+	id id;
+	where id ne 17;
+	where also id ne 18;
+	means ethnic / duncan tukey lines;
+run;
+/* Regression using Automatic Variable Selection */
+proc reg data=hmk7 plots(only)=none;
+	title 'Automatic Variable Selction';
+	/* Cp Method */
+	model gpa = test black hispanic test_black test_hispanic / selection=cp;
+	/* Stepwise Selection */
+	model gpa = test black hispanic test_black test_hispanic / selection=stepwise;
+	id id;
+	where id ne 17;
+	where also id ne 18;
+run;
+/* Test of Normality of Residuals with Interactions */
+proc univariate normal plots data=hmk7InterDiag;
+	var interSres;
+	title 'Test of Normality of Residuals with Interactions';
+run;
 ods graphics off;

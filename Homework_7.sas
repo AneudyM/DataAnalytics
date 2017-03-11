@@ -1,5 +1,6 @@
 data hmk7;
 	input gpa test ethnic;
+	id = _n_;
 	/* Segmentation for Dummy Coding */
 	if ethnic = 0 then white = 0;
 	if ethnic in (1,2) then white = 0;
