@@ -44,25 +44,20 @@ proc means mean std data=hmk7;
 	format ethnic ethnf.;
 	class ethnic;
 run;
-
 ods graphics on;	* Needed for SAS University Edition to generate graphs;
 /* Regression Analysis using REG with Interactions */
-proc reg data=hmk7 plots(only)=(RSTUDENTBYPREDICTED
-								OBSERVEDBYPREDICTED);
+proc reg data=hmk7 plots(only)=(RSTUDENTBYPREDICTED OBSERVEDBYPREDICTED);
 	title 'Regression Analysis for GPA using REG';
 	title2 'Interactions included';
-	model gpa = test black hispanic 
-				test_black test_hispanic / p r covb vif collinoint influence
-										   dw dwprob;
+	model gpa = test black hispanic test_black test_hispanic 
+	/ p r covb vif collinoint influence dw dwprob;
 	output out=hmk7InterDiag predicted=interPre rstudent=interSres;
 run;
 /* Regression Analysis using REG with NO INTERACTIONS */
-proc reg data=hmk7 plots(only)=(RSTUDENTBYPREDICTED
-								OBSERVEDBYPREDICTED);
+proc reg data=hmk7 plots(only)=(RSTUDENTBYPREDICTED OBSERVEDBYPREDICTED);
 	title 'Regression Analysis for GPA using REG';
 	title2 'NO INTERACTIONS';
-	model gpa = test black hispanic / p r covb vif collinoint influence 
-									  dw dwprob;
+	model gpa = test black hispanic / p r covb vif collinoint influence dw dwprob;
 	output out=hmk7Diag predicted=pre rstudent=sres;
 run;
 /* Regression using Automatic Variable Selection */
