@@ -53,13 +53,6 @@ proc reg data=hmk7 plots(only)=(RSTUDENTBYPREDICTED OBSERVEDBYPREDICTED);
 	/ p r covb vif collinoint influence dw dwprob;
 	output out=hmk7InterDiag predicted=interPre rstudent=interSres;
 run;
-/* Regression Analysis using REG with NO INTERACTIONS */
-proc reg data=hmk7 plots(only)=(RSTUDENTBYPREDICTED OBSERVEDBYPREDICTED);
-	title 'Regression Analysis for GPA using REG';
-	title2 'NO INTERACTIONS';
-	model gpa = test black hispanic / p r covb vif collinoint influence dw dwprob;
-	output out=hmk7Diag predicted=pre rstudent=sres;
-run;
 /* Regression Analysis usign GLM with Interactions*/
 proc glm data=hmk7 plots=ancovaplot(clm);
 	title 'Regression Analysis for GPA using GLM';
@@ -67,15 +60,6 @@ proc glm data=hmk7 plots=ancovaplot(clm);
 	format ethnic ethnf.;
 	class ethnic;
 	model gpa = test ethnic test*ethnic / solution alpha=0.05;
-	means ethnic / duncan tukey lines;
-run;
-/* Regression Analysis using GLM with NO INTERACTIONS */
-proc glm data=hmk7 plots=ancovaplot(clm);
-	title 'Regression Analysis for GPA using GLM';
-	title2 'NO INTERACTIONS';
-	format ethnic ethnf.;
-	class ethnic;
-	model gpa = test ethnic / solution alpha=0.05;
 	means ethnic / duncan tukey lines;
 run;
 /* Regression using Automatic Variable Selection */
@@ -86,12 +70,10 @@ proc reg data=hmk7 plots(only)=none;
 	/* Stepwise Selection */
 	model gpa = test black hispanic test_black test_hispanic / selection=stepwise;
 run;
+/* Test of Normality of Residuals with Interactions */
 proc univariate normal plots data=hmk7InterDiag;
 	var interSres;
 	title 'Test of Normality of Residuals with Interactions';
 run;
-proc univariate normal plots data=hmk7Diag;
-	var sres;
-	title 'Test of Normality of Residuals NO INTERACTIONS';
-run;
+
 ods graphics off;
