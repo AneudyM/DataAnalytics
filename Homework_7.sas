@@ -46,9 +46,11 @@ proc means mean std data=hmk7;
 	format ethnic ethnf.;
 	class ethnic;
 run;
-ods graphics on;
+ods graphics on;	* Needed for SAS University Edition to generate graphs;
+/* Perform Regression Analysis */
 proc reg data=hmk7 plots(only)=none;
-	model gpa = test black hispanic;
+	title 'Regression Analysis to Predict GPA';
+	model gpa = test black hispanic / r covb;
+	output out=diagnostics predicted=pre rstudent=res;
 run;
-
 ods graphics off;
