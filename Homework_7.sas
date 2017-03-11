@@ -7,12 +7,10 @@ data hmk7;
 	if ethnic in (0,2) then black = 0;
 	if ethnic = 2 then hispanic = 1;
 	if ethnic in (0,1) then hispanic = 0;
-
 	/* Interaction between ethnicity and test scores */
 	test_white = white * test;
 	test_black = blak * test;
 	test_hispanic = hispanic * test;
-	
 	/* Raw data */
 	datalines;
 	3.0 5.5 0
@@ -47,10 +45,18 @@ proc means mean std data=hmk7;
 	class ethnic;
 run;
 ods graphics on;	* Needed for SAS University Edition to generate graphs;
-/* Perform Regression Analysis */
+/* Regression Analysis using REG */
 proc reg data=hmk7 plots(only)=none;
-	title 'Regression Analysis to Predict GPA';
-	model gpa = test black hispanic / r covb;
+	title 'Regression Analysis for GPA using REG';
+	title2 'Interactions included';
+	model gpa = test black hispanic test_black test_hispanic / r covb;
 	output out=diagnostics predicted=pre rstudent=res;
+run;
+/* Regression Analysis usign GLM */
+proc glm data=hmk7;
+	title 'Regression Analysis for GPA using GLM';
+	title2 'Interactions included';
+	class ethnic;
+	model gpa = test ethnic test*ethnic / solution;
 run;
 ods graphics off;
