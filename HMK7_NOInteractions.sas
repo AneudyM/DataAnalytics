@@ -4,13 +4,13 @@ data hmk7;
 	/* Segmentation for Dummy Coding */
 	if ethnic = 0 then white = 0;
 	if ethnic in (1,2) then white = 0;
-	if ethnic = 1 then black = 1;
-	if ethnic in (0,2) then black = 0;
+	if ethnic = 1 then aa = 1;
+	if ethnic in (0,2) then aa = 0;
 	if ethnic = 2 then hispanic = 1;
 	if ethnic in (0,1) then hispanic = 0;
 	/* Interaction between ethnicity and test scores */
 	test_white = white * test;
-	test_black = black * test;
+	test_aa = aa * test;
 	test_hispanic = hispanic * test;
 	/* Raw data */
 	datalines;
@@ -37,7 +37,7 @@ data hmk7;
 	;
 	/* Assigning labels to the levels of the ethnic variable */
 	proc format;
-		value ethnf 0 = "White" 1 = "Black" 2 = "Hispanic";
+		value ethnf 0 = "White" 1 = "African American" 2 = "Hispanic";
 	run;
 run;
 /* Getting descriptive statistics */
@@ -50,7 +50,7 @@ ods graphics on;	* Needed for SAS University Edition to generate graphs;
 proc reg data=hmk7 plots(only)=(RSTUDENTBYPREDICTED OBSERVEDBYPREDICTED);
 	title 'Regression Analysis for GPA using REG';
 	title2 'NO INTERACTIONS';
-	model gpa = test black hispanic / p r covb vif collinoint influence dw dwprob;
+	model gpa = test aa hispanic / p r covb vif collinoint influence dw dwprob;
 	output out=hmk7Diag predicted=pre rstudent=sres;
 run;
 /* Regression Analysis using GLM with NO INTERACTIONS */
@@ -66,9 +66,9 @@ run;
 proc reg data=hmk7 plots(only)=none;
 	title 'Automatic Variable Selction';
 	/* Cp Method */
-	model gpa = test black hispanic test_black test_hispanic / selection=cp;
+	model gpa = test aa hispanic test_aa test_hispanic / selection=cp;
 	/* Stepwise Selection */
-	model gpa = test black hispanic test_black test_hispanic / selection=stepwise;
+	model gpa = test aa hispanic test_aa test_hispanic / selection=stepwise;
 run;
 /* Test of Normality of Residuals with NO INTERACTIONS */
 proc univariate normal plots data=hmk7Diag;
